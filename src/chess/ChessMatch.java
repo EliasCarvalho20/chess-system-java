@@ -83,9 +83,24 @@ public class ChessMatch {
 
 		return (ChessPiece) capturedPiece;
 	}
+	
+	private Piece makeMove(Position source, Position target) {
+		ChessPiece p = (ChessPiece) board.removePiece(source);
+		p.increaseMoveCount();
+		Piece capturedPiece = board.removePiece(target);
+		board.placePiece(p, target);
 
+		if (capturedPiece != null) {
+			piecesOnTheBoard.remove(capturedPiece);
+			capturedPieces.add(capturedPiece);
+		}
+
+		return capturedPiece;
+	}
+	
 	public void undoMove(Position source, Position target, Piece capturedPiece) {
-		Piece p = board.removePiece(target);
+		ChessPiece p = (ChessPiece) board.removePiece(target);
+		p.decreaseMoveCount();
 		board.placePiece(p, source);
 
 		if (capturedPiece != null) {
@@ -111,19 +126,6 @@ public class ChessMatch {
 		if (!board.piece(source).possibleMove(target)) {
 			throw new ChessException("The chosen piece can't move to target position");
 		}
-	}
-
-	private Piece makeMove(Position source, Position target) {
-		Piece p = board.removePiece(source);
-		Piece capturedPiece = board.removePiece(target);
-		board.placePiece(p, target);
-
-		if (capturedPiece != null) {
-			piecesOnTheBoard.remove(capturedPiece);
-			capturedPieces.add(capturedPiece);
-		}
-
-		return capturedPiece;
 	}
 
 	private void nextTurn() {
